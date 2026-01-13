@@ -585,6 +585,19 @@ export function useGameState() {
       ...gameState,
       phase: "slideshow",
       currentSlideIndex: 0,
+      slideTimeRemaining: 5,
+    };
+    setGameState(newState);
+    network.broadcastGameState(newState);
+  }, [gameState]);
+
+  const updateSlideTime = useCallback((time: number) => {
+    const network = networkRef.current;
+    if (!network?.isHost || !gameState) return;
+
+    const newState: GameState = {
+      ...gameState,
+      slideTimeRemaining: time,
     };
     setGameState(newState);
     network.broadcastGameState(newState);
@@ -594,8 +607,9 @@ export function useGameState() {
     const network = networkRef.current;
     if (!network?.isHost || !gameState) return;
 
+    // Filter out host - only count participant drawings
     const playersWithDrawings = gameState.players.filter(
-      (p) => p.drawingDataUrl
+      (p) => !p.isHost && p.drawingDataUrl
     );
     const newIndex = gameState.currentSlideIndex + 1;
 
@@ -611,6 +625,7 @@ export function useGameState() {
       const newState: GameState = {
         ...gameState,
         currentSlideIndex: newIndex,
+        slideTimeRemaining: 5, // Reset timer for new slide
       };
       setGameState(newState);
       network.broadcastGameState(newState);
@@ -629,6 +644,7 @@ export function useGameState() {
       quizTimeRemaining: QUIZ_DURATION,
       drawingTimeRemaining: DRAWING_DURATION,
       currentSlideIndex: 0,
+      slideTimeRemaining: 5,
       reactions: {},
       players: gameState.players.map((p) => ({
         ...p,
@@ -664,6 +680,7 @@ export function useGameState() {
     startDrawingPhase,
     updateDrawingTime,
     startSlideshow,
+    updateSlideTime,
     nextSlide,
     resetGame,
   };

@@ -46,6 +46,7 @@ export interface GameState {
   quizTimeRemaining: number;
   drawingTimeRemaining: number;
   currentSlideIndex: number;
+  slideTimeRemaining: number;
   reactions: Record<string, { thumbsUp: string[]; thumbsDown: string[] }>; // playerId -> who reacted
 }
 
@@ -81,13 +82,27 @@ export const BASE_TOOLS: DrawingTool[] = [
 export const UNLOCKABLE_TOOLS: DrawingTool[] = [
   { name: 'Eraser', icon: '🧹', color: '#ffffff', size: 20, type: 'eraser', unlockThreshold: 1 },
   { name: 'Fill', icon: '🪣', color: '#000000', size: 0, type: 'fill', unlockThreshold: 2 },
-  { name: 'Red', icon: '🔴', color: '#ef4444', size: 3, type: 'pen', unlockThreshold: 3 },
-  { name: 'Blue', icon: '🔵', color: '#3b82f6', size: 3, type: 'pen', unlockThreshold: 4 },
-  { name: 'Green', icon: '🟢', color: '#22c55e', size: 3, type: 'pen', unlockThreshold: 5 },
-  { name: 'Yellow', icon: '🟡', color: '#eab308', size: 3, type: 'pen', unlockThreshold: 6 },
-  { name: 'Brush', icon: '🖌️', color: '#000000', size: 12, type: 'brush', unlockThreshold: 7 },
-  { name: 'Fine Pen', icon: '🖊️', color: '#000000', size: 1, type: 'pen', unlockThreshold: 8 },
+  { name: 'Brush', icon: '🖌️', color: '#000000', size: 12, type: 'brush', unlockThreshold: 3 },
+  { name: 'Fine Pen', icon: '🖊️', color: '#000000', size: 1, type: 'pen', unlockThreshold: 4 },
 ];
+
+// Colors unlocked based on quiz performance
+export interface UnlockableColor {
+  name: string;
+  color: string;
+  unlockThreshold: number;
+}
+
+export const UNLOCKABLE_COLORS: UnlockableColor[] = [
+  { name: 'Red', color: '#ef4444', unlockThreshold: 5 },
+  { name: 'Blue', color: '#3b82f6', unlockThreshold: 6 },
+  { name: 'Green', color: '#22c55e', unlockThreshold: 7 },
+  { name: 'Yellow', color: '#eab308', unlockThreshold: 8 },
+];
+
+export function getUnlockedColors(quizScore: number): UnlockableColor[] {
+  return UNLOCKABLE_COLORS.filter((c) => quizScore >= c.unlockThreshold);
+}
 
 // Hardcoded quiz questions
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
@@ -164,6 +179,7 @@ export function createInitialGameState(roomCode: string): GameState {
     quizTimeRemaining: QUIZ_DURATION,
     drawingTimeRemaining: DRAWING_DURATION,
     currentSlideIndex: 0,
+    slideTimeRemaining: 5,
     reactions: {},
   };
 }

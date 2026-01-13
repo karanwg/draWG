@@ -28,6 +28,7 @@ export default function Home() {
     startDrawingPhase,
     updateDrawingTime,
     startSlideshow,
+    updateSlideTime,
     nextSlide,
     resetGame,
   } = useGameState();
@@ -108,6 +109,7 @@ export default function Home() {
             isHost={isHost}
             onSubmitReaction={submitReaction}
             onNextSlide={nextSlide}
+            onUpdateSlideTime={updateSlideTime}
           />
         );
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getStroke } from "perfect-freehand";
-import { DrawingTool, GameState, getUnlockedTools, Player, ToolType } from "../lib/types";
+import { DrawingTool, GameState, getUnlockedTools, getUnlockedColors, Player, ToolType } from "../lib/types";
 
 interface DrawingCanvasProps {
   gameState: GameState;
@@ -130,11 +130,11 @@ export function DrawingCanvas({
   const [selectedColor, setSelectedColor] = useState('#000000');
 
   const unlockedTools = localPlayer ? getUnlockedTools(localPlayer.quizScore) : [];
+  const unlockedColors = localPlayer ? getUnlockedColors(localPlayer.quizScore) : [];
   const participants = gameState.players.filter((p) => !p.isHost);
 
-  // Get color tools for the color picker
-  const colorTools = unlockedTools.filter(t => t.type === 'pen' && t.color !== '#000000');
-  const hasColorOptions = colorTools.length > 0;
+  // Check if player has unlocked any colors
+  const hasColorOptions = unlockedColors.length > 0;
 
   // Set default tool
   useEffect(() => {
@@ -398,14 +398,15 @@ export function DrawingCanvas({
               >
                 <span className="color-dot" style={{ backgroundColor: '#000000' }} />
               </button>
-              {colorTools.map((tool, index) => (
+              {unlockedColors.map((colorItem, index) => (
                 <button
                   key={index}
-                  className={`color-btn ${selectedColor === tool.color ? 'active' : ''}`}
-                  onClick={() => setSelectedColor(tool.color)}
+                  className={`color-btn ${selectedColor === colorItem.color ? 'active' : ''}`}
+                  onClick={() => setSelectedColor(colorItem.color)}
                   disabled={hasSubmitted}
+                  title={colorItem.name}
                 >
-                  <span className="color-dot" style={{ backgroundColor: tool.color }} />
+                  <span className="color-dot" style={{ backgroundColor: colorItem.color }} />
                 </button>
               ))}
             </div>

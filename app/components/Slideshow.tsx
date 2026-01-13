@@ -9,6 +9,7 @@ interface SlideshowProps {
   isHost: boolean;
   onSubmitReaction: (targetPlayerId: string, reactionType: "thumbsUp" | "thumbsDown") => void;
   onNextSlide: () => void;
+  onUpdateSlideTime: (time: number) => void;
 }
 
 export function Slideshow({
@@ -17,34 +18,33 @@ export function Slideshow({
   isHost,
   onSubmitReaction,
   onNextSlide,
+  onUpdateSlideTime,
 }: SlideshowProps) {
-  const [timeRemaining, setTimeRemaining] = useState(5);
   const [hasReacted, setHasReacted] = useState(false);
 
   // Only show drawings from non-host players
   const playersWithDrawings = gameState.players.filter((p) => !p.isHost && p.drawingDataUrl);
   const currentPlayer = playersWithDrawings[gameState.currentSlideIndex];
 
-  // Reset state when slide changes
+  // Reset reaction state when slide changes
   useEffect(() => {
-    setTimeRemaining(5);
     setHasReacted(false);
   }, [gameState.currentSlideIndex]);
 
   // Auto-advance timer (host only)
   useEffect(() => {
     if (!isHost) return;
-    if (timeRemaining <= 0) {
+    if (gameState.slideTimeRemaining <= 0) {
       onNextSlide();
       return;
     }
 
     const interval = setInterval(() => {
-      setTimeRemaining((t) => t - 1);
+      onUpdateSlideTime(gameState.slideTimeRemaining - 1);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isHost, timeRemaining, onNextSlide]);
+  }, [isHost, gameState.slideTimeRemaining, onNextSlide, onUpdateSlideTime]);
 
   const handleReaction = (type: "thumbsUp" | "thumbsDown") => {
     if (!currentPlayer || hasReacted || isHost) return;
@@ -73,7 +73,7 @@ export function Slideshow({
         <div className="slide-progress">
           {gameState.currentSlideIndex + 1} / {playersWithDrawings.length}
         </div>
-        <div className="timer">⏱️ {timeRemaining}s</div>
+        <div className="timer">⏱️ {gameState.slideTimeRemaining}s</div>
       </div>
 
       <div className="slide-content">

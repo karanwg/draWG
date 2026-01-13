@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { GameState, Player, QUIZ_QUESTIONS, getUnlockedTools } from "../lib/types";
+import { GameState, Player, QUIZ_QUESTIONS, getUnlockedTools, getUnlockedColors } from "../lib/types";
 
 interface QuizRoundProps {
   gameState: GameState;
@@ -75,6 +75,7 @@ export function QuizRound({
   };
 
   const unlockedTools = localPlayer ? getUnlockedTools(localPlayer.quizScore) : [];
+  const unlockedColors = localPlayer ? getUnlockedColors(localPlayer.quizScore) : [];
   const allQuestionsAnswered = selectedAnswers.every((a) => a !== null);
 
   // Host sees moderation view
@@ -170,7 +171,7 @@ export function QuizRound({
           <div className="tools-unlocked">
             <h4>🎨 Your Drawing Tools</h4>
             <p className="tools-description">
-              You unlocked {unlockedTools.length} tool{unlockedTools.length !== 1 ? "s" : ""} for the drawing phase!
+              You unlocked {unlockedTools.length} tool{unlockedTools.length !== 1 ? "s" : ""}{unlockedColors.length > 0 ? ` and ${unlockedColors.length} color${unlockedColors.length !== 1 ? "s" : ""}` : ""} for the drawing phase!
             </p>
             <ul>
               {unlockedTools.map((tool, index) => (
@@ -180,6 +181,18 @@ export function QuizRound({
                 </li>
               ))}
             </ul>
+            {unlockedColors.length > 0 && (
+              <div className="unlocked-colors">
+                {unlockedColors.map((c, index) => (
+                  <span 
+                    key={index} 
+                    className="color-dot" 
+                    style={{ backgroundColor: c.color }}
+                    title={c.name}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <p className="waiting-text">
@@ -272,7 +285,7 @@ export function QuizRound({
           </div>
 
           <div className="tools-unlocked">
-            <h4>Unlocked Tools</h4>
+            <h4>Unlocked</h4>
             <ul>
               {unlockedTools.map((tool, index) => (
                 <li key={index}>
@@ -281,6 +294,18 @@ export function QuizRound({
                 </li>
               ))}
             </ul>
+            {unlockedColors.length > 0 && (
+              <div className="unlocked-colors">
+                {unlockedColors.map((c, index) => (
+                  <span 
+                    key={index} 
+                    className="color-dot" 
+                    style={{ backgroundColor: c.color }}
+                    title={c.name}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
